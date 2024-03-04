@@ -170,7 +170,7 @@ export default class OrderModel extends Model {
             return null;
         }
 
-        return formatDate(this.updated_at, 'PP');
+        return formatDate(this.updated_at, 'dd, MMM');
     }
 
     @computed('created_at') get createdAgo() {
@@ -194,7 +194,7 @@ export default class OrderModel extends Model {
             return null;
         }
 
-        return formatDate(this.created_at, 'PP');
+        return formatDate(this.created_at, 'dd, MMM');
     }
 
     @computed('created_at') get createdAtWithTime() {
@@ -226,7 +226,7 @@ export default class OrderModel extends Model {
             return null;
         }
 
-        return formatDate(this.dispatched_at, 'PP  HH:mm');
+        return formatDate(this.dispatched_at, 'PP HH:mm');
     }
 
     @computed('dispatched_at') get dispatchedAtShort() {
@@ -234,7 +234,7 @@ export default class OrderModel extends Model {
             return null;
         }
 
-        return formatDate(this.dispatched_at, 'PP');
+        return formatDate(this.dispatched_at, 'dd, MMM');
     }
 
     @computed('started_at') get startedAgo() {
@@ -258,7 +258,7 @@ export default class OrderModel extends Model {
             return null;
         }
 
-        return formatDate(this.started_at, 'PP');
+        return formatDate(this.started_at, 'dd, MMM');
     }
 
     @computed('scheduled_at') get scheduledAt() {
