@@ -24,7 +24,7 @@ export default class OrderConfigModel extends Model {
     @attr('boolean', { defaultValue: false }) core_service;
     @attr('array') tags;
     @attr('object') flow;
-    @attr('object') entities;
+    @attr('array') entities;
     @attr('object') meta;
 
     /** @computed */
