@@ -18,7 +18,8 @@ export default class PlaceModel extends Model {
     @attr('string') type;
     @attr('string', {
         defaultValue: get(config, 'defaultValues.placeAvatar'),
-    }) avatar_url;
+    })
+    avatar_url;
     @attr('string') avatar_value;
     @attr('string') address;
     @attr('string') address_html;

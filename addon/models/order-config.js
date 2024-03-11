@@ -21,10 +21,11 @@ export default class OrderConfigModel extends Model {
     @attr('string') key;
     @attr('string') status;
     @attr('string') version;
+    @attr('string') type;
     @attr('boolean', { defaultValue: false }) core_service;
     @attr('array') tags;
-    @attr('object') flow;
     @attr('array') entities;
+    @attr('object') flow;
     @attr('object') meta;
 
     /** @computed */
