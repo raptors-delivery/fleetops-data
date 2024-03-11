@@ -49,7 +49,8 @@ export default class DriverModel extends Model {
     @attr('string') drivers_license_number;
     @attr('string', {
         defaultValue: get(config, 'defaultValues.driverAvatar'),
-    }) avatar_url;
+    })
+    avatar_url;
     @attr('string') avatar_value;
     @attr('point') location;
     @attr('number') heading;
