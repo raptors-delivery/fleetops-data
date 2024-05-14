@@ -13,6 +13,7 @@ export default class OrderSerializer extends ApplicationSerializer.extend(Embedd
             order_config: { embedded: 'always' },
             payload: { embedded: 'always' },
             driver_assigned: { embedded: 'always' },
+            vehicle_assigned: { embedded: 'always' },
             facilitator: { embedded: 'always' },
             customer: { embedded: 'always' },
             transaction: { embedded: 'always' },
@@ -78,7 +79,6 @@ export default class OrderSerializer extends ApplicationSerializer.extend(Embedd
 
         // if snapshot already has type filled respect manual input
         const isPolymorphicTypeBlank = isBlank(snapshot.attr(key + '_type'));
-
         if (isPolymorphicTypeBlank) {
             key = this.keyForAttribute ? this.keyForAttribute(key, 'serialize') : key;
 

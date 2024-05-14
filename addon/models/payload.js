@@ -15,8 +15,8 @@ export default class PayloadModel extends Model {
     @belongsTo('place', { async: false }) pickup;
     @belongsTo('place', { async: false }) dropoff;
     @belongsTo('place', { async: false }) return;
-    @hasMany('waypoint') waypoints;
-    @hasMany('entity') entities;
+    @hasMany('waypoint', { async: false }) waypoints;
+    @hasMany('entity', { async: false }) entities;
 
     /** @attributes */
     @attr('string') meta;
