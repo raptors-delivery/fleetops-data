@@ -35,6 +35,7 @@ export default class OrderModel extends Model {
     @belongsTo('transaction', { async: false }) transaction;
     @belongsTo('payload', { async: false }) payload;
     @belongsTo('driver', { async: false, inverse: 'jobs' }) driver_assigned;
+    @belongsTo('vehicle', { async: false }) vehicle_assigned;
     @belongsTo('route', { async: false }) route;
     @belongsTo('purchase-rate', { async: false }) purchase_rate;
     @belongsTo('tracking-number', { async: false }) tracking_number;
@@ -45,6 +46,7 @@ export default class OrderModel extends Model {
 
     /** @aliases */
     @alias('driver_assigned') driver;
+    @alias('vehicle_assigned') vehicle;
 
     /** @attributes */
     @attr('string') tracking;
