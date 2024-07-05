@@ -1,4 +1,4 @@
-import Model, { attr, belongsTo } from '@ember-data/model';
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 import { computed } from '@ember/object';
 import { format as formatDate, isValid as isValidDate, formatDistanceToNow } from 'date-fns';
 
@@ -7,10 +7,13 @@ export default class ContactModel extends Model {
     @attr('string') public_id;
     @attr('string') company_uuid;
     @attr('string') photo_uuid;
+    @attr('string') place_uuid;
     @attr('string') internal_id;
 
     /** @relationships */
     @belongsTo('file') photo;
+    @belongsTo('place') address;
+    @hasMany('place') addresses;
 
     /** @attributes */
     @attr('string') name;
