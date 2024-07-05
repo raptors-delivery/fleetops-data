@@ -1,5 +1,5 @@
 import ContactModel from './contact';
-import { attr } from '@ember-data/model';
+import { attr, hasMany } from '@ember-data/model';
 import { computed } from '@ember/object';
 import { equal } from '@ember/object/computed';
 import { format as formatDate, isValid as isValidDate, formatDistanceToNow } from 'date-fns';
@@ -8,6 +8,9 @@ export default class CustomerModel extends ContactModel {
     /** @attributes */
     @attr('string') name;
     @attr('string') customer_type;
+
+    /** @relations */
+    @hasMany('waypoint') waypoints;
 
     /** @computed */
     @equal('customer_type', 'vendor') isVendor;

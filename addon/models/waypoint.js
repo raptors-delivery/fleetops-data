@@ -6,7 +6,7 @@ export default class WaypointModel extends PlaceModel {
     /** @relationships */
     @belongsTo('place', { async: false }) place;
     @belongsTo('tracking-number', { async: false }) tracking_number;
-    @belongsTo('customer', { polymorphic: true, async: false }) customer;
+    @belongsTo('customer', { polymorphic: true, async: false, inverse: 'waypoints' }) customer;
 
     /** @attributes */
     @attr('string') public_id;
