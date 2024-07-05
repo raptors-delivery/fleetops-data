@@ -5,8 +5,8 @@ dependencies:
     specifier: ^7.23.2
     version: 7.23.2
   '@fleetbase/ember-core':
-    specifier: ^0.2.11
-    version: 0.2.11(@ember/test-helpers@3.2.0)(ember-source@5.4.0)(webpack@5.89.0)
+    specifier: ^0.2.12
+    version: 0.2.12(@ember/test-helpers@3.2.0)(ember-source@5.4.0)(webpack@5.89.0)
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
@@ -1882,8 +1882,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@fleetbase/ember-core@0.2.11(@ember/test-helpers@3.2.0)(ember-source@5.4.0)(webpack@5.89.0):
-    resolution: {integrity: sha512-ogf1J1Yv1kJ3/8eUGzdS2l1UjDZE4b4u3q/86Ue0X2tskzTNSto3P8MWt/BaXAke1E0UbDXOq4aeB624OgTm7w==}
+  /@fleetbase/ember-core@0.2.12(@ember/test-helpers@3.2.0)(ember-source@5.4.0)(webpack@5.89.0):
+    resolution: {integrity: sha512-/ZoZsoGKqtw6AhvK5UYQm24+xyzRo10x8V8g7bEvO4tuPKmtXQj67RcIojh2yplWZNow5LyT8oYZZU3Ft35JXg==}
     engines: {node: '>= 18'}
     dependencies:
       '@babel/core': 7.23.2
