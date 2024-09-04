@@ -6,20 +6,24 @@ export default class ContactModel extends Model {
     /** @ids */
     @attr('string') public_id;
     @attr('string') company_uuid;
+    @attr('string') user_uuid;
     @attr('string') photo_uuid;
     @attr('string') place_uuid;
     @attr('string') internal_id;
 
     /** @relationships */
     @belongsTo('file') photo;
-    @belongsTo('place') address;
-    @hasMany('place') addresses;
+    @belongsTo('user') user;
+    @belongsTo('place') place;
+    @hasMany('place') places;
 
     /** @attributes */
     @attr('string') name;
     @attr('string') title;
     @attr('string') email;
     @attr('string') phone;
+    @attr('string') address;
+    @attr('string') address_street;
     @attr('string') type;
     @attr('string', {
         defaultValue: 'https://s3.ap-southeast-1.amazonaws.com/flb-assets/static/no-avatar.png',

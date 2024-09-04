@@ -1,6 +1,7 @@
-import Model, { attr, belongsTo } from '@ember-data/model';
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 import { computed, get } from '@ember/object';
 import { notEmpty } from '@ember/object/computed';
+import { capitalize } from '@ember/string';
 import { format as formatDate, isValid as isValidDate, formatDistanceToNow } from 'date-fns';
 import config from 'ember-get-config';
 
@@ -17,6 +18,7 @@ export default class VendorModel extends Model {
 
     /** @relationships */
     @belongsTo('place') place;
+    @hasMany('contact') personnels;
 
     /** @attributes */
     @attr('string') name;
@@ -86,5 +88,13 @@ export default class VendorModel extends Model {
             return null;
         }
         return formatDate(this.created_at, 'dd, MMM');
+    }
+
+    @computed('type') get prettyType() {
+        if (typeof this.type !== 'string') {
+            return '';
+        }
+
+        return this.type.replace('-', ' ').split(' ').map(capitalize).join(' ');
     }
 }
