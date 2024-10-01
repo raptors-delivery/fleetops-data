@@ -36,6 +36,7 @@ export default class PlaceModel extends Model {
     @attr('string') country_name;
     @attr('string') vendor_name;
     @attr('string') _import_id;
+    @attr('string') eta;
     @attr('point') location;
     @attr('raw') meta;
 
@@ -88,6 +89,11 @@ export default class PlaceModel extends Model {
     @computed('latitude', 'longitude') get coordinates() {
         // eslint-disable-next-line ember/no-get
         return [get(this, 'latitude'), get(this, 'longitude')];
+    }
+
+    @computed('latitude', 'longitude') get positionString() {
+        // eslint-disable-next-line ember/no-get
+        return `${get(this, 'latitude')} ${get(this, 'longitude')}`;
     }
 
     @computed('latitude', 'longitude') get latlng() {

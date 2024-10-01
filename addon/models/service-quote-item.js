@@ -4,6 +4,7 @@ import { format as formatDate, isValid as isValidDate, formatDistanceToNow } fro
 
 export default class ServiceQuoteItemModel extends Model {
     /** @ids */
+    @attr('string') public_id;
     @attr('string') service_quote_uuid;
 
     /** @attributes */

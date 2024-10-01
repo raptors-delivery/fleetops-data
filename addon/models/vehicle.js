@@ -1,8 +1,10 @@
 import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 import { get, computed } from '@ember/object';
+import { not } from '@ember/object/computed';
 import { format as formatDate, isValid as isValidDate, formatDistanceToNow } from 'date-fns';
 import { getOwner } from '@ember/application';
 import isRelationMissing from '@fleetbase/ember-core/utils/is-relation-missing';
+import isValidCoordinates from '@fleetbase/ember-core/utils/is-valid-coordinates';
 import config from 'ember-get-config';
 
 export default class VehicleModel extends Model {
@@ -99,6 +101,52 @@ export default class VehicleModel extends Model {
         }
         return formatDate(this.created_at, 'dd, MMM');
     }
+
+    @computed('location') get longitude() {
+        return get(this.location, 'coordinates.0');
+    }
+
+    @computed('location') get latitude() {
+        return get(this.location, 'coordinates.1');
+    }
+
+    @computed('latitude', 'longitude') get coordinates() {
+        // eslint-disable-next-line ember/no-get
+        return [get(this, 'latitude'), get(this, 'longitude')];
+    }
+
+    @computed('latitude', 'longitude') get positionString() {
+        // eslint-disable-next-line ember/no-get
+        return `${get(this, 'latitude')} ${get(this, 'longitude')}`;
+    }
+
+    @computed('latitude', 'longitude') get latlng() {
+        return {
+            // eslint-disable-next-line ember/no-get
+            lat: get(this, 'latitude'),
+            // eslint-disable-next-line ember/no-get
+            lng: get(this, 'longitude'),
+        };
+    }
+
+    @computed('latitude', 'longitude') get latitudelongitude() {
+        return {
+            // eslint-disable-next-line ember/no-get
+            latitude: get(this, 'latitude'),
+            // eslint-disable-next-line ember/no-get
+            longitude: get(this, 'longitude'),
+        };
+    }
+
+    @computed('coordinates', 'latitude', 'longitude') get hasValidCoordinates() {
+        if (this.longitude === 0 || this.latitude === 0) {
+            return false;
+        }
+
+        return isValidCoordinates(this.coordinates);
+    }
+
+    @not('hasValidCoordinates') hasInvalidCoordinates;
 
     /** @methods */
     loadDriver() {
