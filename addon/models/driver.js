@@ -5,8 +5,6 @@ import { getOwner } from '@ember/application';
 import { format as formatDate, isValid as isValidDate, formatDistanceToNow } from 'date-fns';
 import isRelationMissing from '@fleetbase/ember-core/utils/is-relation-missing';
 import isValidCoordinates from '@fleetbase/ember-core/utils/is-valid-coordinates';
-import isLatitude from '@fleetbase/ember-core/utils/is-latitude';
-import isLongitude from '@fleetbase/ember-core/utils/is-longitude';
 import config from 'ember-get-config';
 
 export default class DriverModel extends Model {
@@ -123,31 +121,22 @@ export default class DriverModel extends Model {
         return formatDate(this.created_at, 'dd, MMM');
     }
 
-    @computed('location') get latitude() {
-        if (this.location) {
-            let x = get(this.location, 'coordinates.0');
-            let y = get(this.location, 'coordinates.1');
-
-            return isLatitude(x) ? x : y;
-        }
-
-        return 0;
+    @computed('location') get longitude() {
+        return get(this.location, 'coordinates.0');
     }
 
-    @computed('location') get longitude() {
-        if (this.location) {
-            let x = get(this.location, 'coordinates.0');
-            let y = get(this.location, 'coordinates.1');
-
-            return isLongitude(y) ? y : x;
-        }
-
-        return 0;
+    @computed('location') get latitude() {
+        return get(this.location, 'coordinates.1');
     }
 
     @computed('latitude', 'longitude') get coordinates() {
         // eslint-disable-next-line ember/no-get
         return [get(this, 'latitude'), get(this, 'longitude')];
+    }
+
+    @computed('latitude', 'longitude') get positionString() {
+        // eslint-disable-next-line ember/no-get
+        return `${get(this, 'latitude')} ${get(this, 'longitude')}`;
     }
 
     @computed('latitude', 'longitude') get latlng() {
@@ -168,7 +157,11 @@ export default class DriverModel extends Model {
         };
     }
 
-    @computed('coordinates') get hasValidCoordinates() {
+    @computed('coordinates', 'latitude', 'longitude') get hasValidCoordinates() {
+        if (this.longitude === 0 || this.latitude === 0) {
+            return false;
+        }
+
         return isValidCoordinates(this.coordinates);
     }
 

@@ -7,6 +7,7 @@ import { isBlank } from '@ember/utils';
 import { getOwner } from '@ember/application';
 import { format as formatDate, formatDistanceToNow, isValid as isValidDate } from 'date-fns';
 import isNotModel from '@fleetbase/ember-core/utils/is-not-model';
+import shouldNotLoadRelation from '../utils/should-not-load-relation';
 
 export default class OrderModel extends Model {
     /** @ids */
@@ -51,6 +52,7 @@ export default class OrderModel extends Model {
     /** @attributes */
     @attr('string') tracking;
     @attr('string') qr_code;
+    @attr('string') barcode;
     @attr('string') pickup_name;
     @attr('string') dropoff_name;
     @attr('string') driver_name;
@@ -79,6 +81,8 @@ export default class OrderModel extends Model {
     @attr('boolean') facilitator_is_vendor;
     @attr('raw') meta;
     @attr('raw') options;
+    @attr('raw') tracker_data;
+    @attr('raw') eta;
 
     /** @dates */
     @attr('date') scheduled_at;
@@ -284,6 +288,10 @@ export default class OrderModel extends Model {
         return this.payload?.isMultiDrop;
     }
 
+    @computed('status') get hasActiveStatus() {
+        return this.status !== 'canceled' && this.status !== 'completed';
+    }
+
     @computed('has_driver_assigned', 'driver_assigned') get canLoadDriver() {
         return this.has_driver_assigned && !this.driver_assigned;
     }
@@ -322,7 +330,6 @@ export default class OrderModel extends Model {
         }
 
         setProperties(this, { payload });
-
         return this;
     }
 
@@ -353,7 +360,6 @@ export default class OrderModel extends Model {
         }
 
         setProperties(this, { meta });
-
         return this;
     }
 
@@ -383,7 +389,6 @@ export default class OrderModel extends Model {
         }
 
         setProperties(this, { meta });
-
         return this;
     }
 
@@ -408,7 +413,6 @@ export default class OrderModel extends Model {
         }
 
         setProperties(this, { meta: serializedMeta });
-
         return this;
     }
 
@@ -425,165 +429,158 @@ export default class OrderModel extends Model {
             options.onBefore(this);
         }
 
-        return fetch.put(`orders/${this.id}`, properties, { normalizeToEmberData: true, normalizeModelType: 'order' }).then((order) => {
-            if (typeof options.onAfter === 'function') {
-                options.onAfter(order);
-            }
-        });
+        const order = await fetch.put(`orders/${this.id}`, properties, { normalizeToEmberData: true, normalizeModelType: 'order' });
+        if (typeof options.onAfter === 'function') {
+            options.onAfter(order);
+        }
     }
 
     async loadPayload(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
-        if (!this.payload_uuid || !isBlank(this.payload)) {
+        if (shouldNotLoadRelation(this, 'payload')) {
             return;
         }
 
-        return store
-            .queryRecord(
-                'payload',
-                {
-                    uuid: this.payload_uuid,
-                    single: true,
-                    with: ['pickup', 'dropoff', 'return', 'waypoints', 'entities'],
-                },
-                options
-            )
-            .then((payload) => {
-                this.set('payload', payload);
-                return payload;
-            });
+        const payload = await store.queryRecord(
+            'payload',
+            {
+                uuid: this.payload_uuid,
+                single: true,
+                with: ['pickup', 'dropoff', 'return', 'waypoints', 'entities'],
+            },
+            options
+        );
+
+        this.set('payload', payload);
+        return payload;
     }
 
     async loadCustomer(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
+        if (shouldNotLoadRelation(this, 'customer')) {
+            return;
+        }
 
         if (!this.customer_uuid || !isBlank(this.customer)) {
             return;
         }
 
-        return store.findRecord(`customer-${this.customer_type}`, this.customer_uuid, options).then((customer) => {
-            this.set('customer', customer);
-            return customer;
-        });
+        const customer = await store.findRecord(`customer-${this.customer_type}`, this.customer_uuid, options);
+        this.set('customer', customer);
+        return customer;
     }
 
     async loadPurchaseRate(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
-        if (!this.purchase_rate_uuid || !isBlank(this.purchase_rate)) {
+        if (shouldNotLoadRelation(this, 'purchase_rate')) {
             return;
         }
 
-        return store.findRecord('purchase-rate', this.purchase_rate_uuid, options).then((purchaseRate) => {
-            this.set('purchase_rate', purchaseRate);
-            return purchaseRate;
-        });
+        const purchaseRate = await store.findRecord('purchase-rate', this.purchase_rate_uuid, options);
+        this.set('purchase_rate', purchaseRate);
+        return purchaseRate;
     }
 
     async loadOrderConfig(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
-        if (!this.order_config_uuid || !isBlank(this.order_config)) {
+        if (shouldNotLoadRelation(this, 'order_config')) {
             return;
         }
 
-        return store.findRecord('order-config', this.order_config_uuid, options).then((orderConfig) => {
-            this.set('order_config', orderConfig);
-            return orderConfig;
-        });
+        const orderConfig = await store.findRecord('order-config', this.order_config_uuid, options);
+        this.set('order_config', orderConfig);
+        return orderConfig;
     }
 
     async loadDriver(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
-        if (!this.driver_assigned_uuid || !isBlank(this.driver_assigned)) {
+        if (shouldNotLoadRelation(this, 'driver_assigned')) {
             return;
         }
 
-        return store.findRecord('driver', this.driver_assigned_uuid, options).then((driver) => {
-            this.set('driver_assigned', driver);
-            return driver;
-        });
+        const driverAssigned = await store.findRecord('driver', this.driver_assigned_uuid, options);
+        this.set('driver_assigned', driverAssigned);
+        return driverAssigned;
     }
 
     async loadTrackingNumber(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
-        if (!this.tracking_number_uuid || !isBlank(this.tracking_number)) {
+        if (shouldNotLoadRelation(this, 'tracking_number')) {
             return;
         }
 
-        return store.findRecord('tracking-number', this.tracking_number_uuid, options).then((trackingNumber) => {
-            this.set('tracking_number', trackingNumber);
-            return trackingNumber;
-        });
+        const trackingNumber = await store.findRecord('tracking-number', this.tracking_number_uuid, options);
+        this.set('tracking_number', trackingNumber);
+        return trackingNumber;
     }
 
     async loadTrackingActivity(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
-
         if (!this.tracking_number_uuid) {
             return;
         }
 
-        return store
-            .query(
-                'tracking-status',
-                {
-                    tracking_number_uuid: this.tracking_number_uuid,
-                },
-                options
-            )
-            .then((activity) => {
-                this.set('tracking_statuses', activity.toArray());
-                return activity;
-            });
+        const activity = await store.query(
+            'tracking-status',
+            {
+                tracking_number_uuid: this.tracking_number_uuid,
+            },
+            options
+        );
+
+        this.set('tracking_statuses', activity.toArray());
+        return activity;
     }
 
     async loadComments(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
 
-        return store
-            .query(
-                'comment',
-                {
-                    subject_uuid: this.id,
-                    withoutParent: 1,
-                    sort: '-created_at',
-                },
-                options
-            )
-            .then((comments) => {
-                this.set('comments', comments);
-                return comments;
-            });
+        const comments = await store.query(
+            'comment',
+            {
+                subject_uuid: this.id,
+                withoutParent: 1,
+                sort: '-created_at',
+            },
+            options
+        );
+
+        this.set('comments', comments);
+        return comments;
     }
 
     async loadFiles(options = {}) {
         const owner = getOwner(this);
         const store = owner.lookup('service:store');
+        const files = await store.query('file', { subject_uuid: this.id, sort: '-created_at' }, options);
 
-        return store
-            .query(
-                'file',
-                {
-                    subject_uuid: this.id,
-                    sort: '-created_at',
-                },
-                options
-            )
-            .then((files) => {
-                this.set('files', files);
-                return files;
-            });
+        this.set('files', files);
+        return files;
+    }
+
+    async loadTrackerData(params = {}, options = {}) {
+        const owner = getOwner(this);
+        const fetch = owner.lookup('service:fetch');
+        const trackerData = await fetch.get(`orders/${this.id}/tracker`, params, options);
+
+        this.set('tracker_data', trackerData);
+        return trackerData;
+    }
+
+    async loadETA(params = {}, options = {}) {
+        const owner = getOwner(this);
+        const fetch = owner.lookup('service:fetch');
+        const eta = await fetch.get(`orders/${this.id}/eta`, params, options);
+
+        this.set('eta', eta);
+        return eta;
     }
 }

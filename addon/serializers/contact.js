@@ -9,8 +9,9 @@ export default class ContactSerializer extends ApplicationSerializer.extend(Embe
      */
     get attrs() {
         return {
-            address: { embedded: 'always' },
-            addresses: { embedded: 'always' },
+            user: { embedded: 'always' },
+            place: { embedded: 'always' },
+            places: { embedded: 'always' },
             photo: { embedded: 'always' },
         };
     }

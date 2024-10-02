@@ -72,6 +72,16 @@ export default class WaypointSerializer extends ApplicationSerializer.extend(Emb
                 type = belongsTo.attr(`${key}_type`);
             }
 
+            // hotfix polymprohpic model types that do not exists as models like `customer-contact` `customer-vendor` should be `contact` or `vendor`
+            if (typeof type === 'string') {
+                if (type.startsWith('customer-')) {
+                    type = type.replace('customer-', '');
+                }
+                if (type.startsWith('facilitator-')) {
+                    type = type.replace('facilitator-', '');
+                }
+            }
+
             if (!belongsTo) {
                 json[key + '_type'] = null;
             } else {

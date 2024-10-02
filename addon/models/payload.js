@@ -36,7 +36,7 @@ export default class PayloadModel extends Model {
     @notEmpty('return_uuid') hasReturn;
 
     @computed('waypoints.[]', 'pickup_uuid', 'dropoff_uuid') get isMultiDrop() {
-        return this.waypoints?.length > 0 && !this.pickup_uuid && !this.dropoff_uuid;
+        return this.waypoints.length > 0 && !this.pickup_uuid && !this.dropoff_uuid;
     }
 
     @computed('waypoints.firstObject') get firstWaypoint() {
@@ -51,13 +51,11 @@ export default class PayloadModel extends Model {
         return this.waypoints.lastObject;
     }
 
-    @computed('current_waypoint_uuid', 'waypoints.@each.id')
-    get currentWaypoint() {
+    @computed('current_waypoint_uuid', 'waypoints.@each.id') get currentWaypoint() {
         return this.waypoints.find((waypoint) => waypoint.id === this.current_waypoint_uuid);
     }
 
-    @computed('currentWaypoint', 'firstWaypoint', 'isMultiDrop', 'dropoff')
-    get nextStop() {
+    @computed('currentWaypoint', 'firstWaypoint', 'isMultiDrop', 'dropoff') get nextStop() {
         const { currentWaypoint, firstWaypoint, isMultiDrop, dropoff } = this;
 
         if (isMultiDrop) {
@@ -75,12 +73,40 @@ export default class PayloadModel extends Model {
         return middleWaypoints;
     }
 
-    @computed('updated_at') get updatedAgo() {
-        return formatDistanceToNow(this.updated_at);
+    @computed('entities', 'model.payload.{entities.[],waypoints.[]}', 'waypoints') get entitiesByDestination() {
+        const groups = [];
+
+        // create groups
+        this.waypoints.forEach((waypoint) => {
+            const destinationId = waypoint.id;
+            if (destinationId) {
+                const entities = this.entities.filter((entity) => entity.destination_uuid === destinationId);
+                if (entities.length === 0) {
+                    return;
+                }
+
+                const group = {
+                    destinationId,
+                    waypoint,
+                    entities,
+                };
+
+                groups.pushObject(group);
+            }
+        });
+
+        return groups;
     }
 
-    @computed('{dropoff,pickup,waypoints}', 'waypoints.[]')
-    get payloadCoordinates() {
+    @computed('model.payload.waypoints', 'waypoints.toArray') get orderWaypoints() {
+        if (this.waypoints && typeof this.waypoints.toArray === 'function') {
+            return this.waypoints.toArray();
+        }
+
+        return this.waypoints;
+    }
+
+    @computed('{dropoff,pickup,waypoints}', 'waypoints.[]') get payloadCoordinates() {
         let waypoints = [];
         let coordinates = [];
 
@@ -96,6 +122,29 @@ export default class PayloadModel extends Model {
         });
 
         return coordinates;
+    }
+
+    @computed('dropoff', 'model.payload.{dropoff,pickup,waypoints}', 'pickup', 'waypoints') get routeWaypoints() {
+        let waypoints = [];
+        let coordinates = [];
+
+        waypoints.pushObjects([this.pickup, ...this.waypoints.toArray(), this.dropoff]);
+        waypoints.forEach((place) => {
+            if (place && place.get('longitude') && place.get('latitude')) {
+                if (place.hasInvalidCoordinates) {
+                    return;
+                }
+
+                coordinates.pushObject([place.get('latitude'), place.get('longitude')]);
+            }
+        });
+
+        return coordinates;
+    }
+
+    /** computed dates */
+    @computed('updated_at') get updatedAgo() {
+        return formatDistanceToNow(this.updated_at);
     }
 
     @computed('updated_at') get updatedAt() {

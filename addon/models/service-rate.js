@@ -42,6 +42,7 @@ export default class ServiceRate extends Model {
     @attr('string') estimated_days;
     @attr('boolean') has_cod_fee;
     @attr('boolean') has_peak_hours_fee;
+    @attr('raw') meta;
 
     /** @dates */
     @attr('date') deleted_at;

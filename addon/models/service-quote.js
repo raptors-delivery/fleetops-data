@@ -4,6 +4,7 @@ import { format as formatDate, isValid as isValidDate, formatDistanceToNow } fro
 
 export default class ServiceQuoteModel extends Model {
     /** @ids */
+    @attr('string') public_id;
     @attr('string') request_id;
     @attr('string') service_rate_uuid;
     @attr('string') payload_uuid;
@@ -15,6 +16,7 @@ export default class ServiceQuoteModel extends Model {
     @attr('string') service_rate_name;
     @attr('string') amount;
     @attr('string') currency;
+    @attr('raw') meta;
 
     /** @dates */
     @attr('date') expired_at;
