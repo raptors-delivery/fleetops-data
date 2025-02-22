@@ -34,7 +34,7 @@ export default class EntityModel extends Model {
     })
     photo_url;
     @attr('string', {
-        defaultValue: 'USD',
+        defaultValue: 'EGP',
     })
     currency;
     @attr('string') barcode;
