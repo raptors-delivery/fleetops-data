@@ -1,3 +1,3 @@
-import ApplicationSerializer from '@fleetbase/ember-core/serializers/application';
+import ContactSerializer from './contact';
 
-export default class CustomerSerializer extends ApplicationSerializer {}
+export default class CustomerSerializer extends ContactSerializer {}
