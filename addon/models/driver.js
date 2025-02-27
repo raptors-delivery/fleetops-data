@@ -40,7 +40,7 @@ export default class DriverModel extends Model {
     photo_url;
     @attr('string') vehicle_name;
     @attr('string', {
-        defaultValue: get(config, 'defaultValues.vehicleImage'),
+        defaultValue: get(config, 'defaultValues.vehicleAvatar'),
     })
     vehicle_avatar;
     @attr('string') vendor_name;
